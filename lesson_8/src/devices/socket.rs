@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn socket_works() {
-        let mut socket = SmartSocket::new("Test".into());
+        let mut socket = SmartSocket::new("Test");
         assert_eq!(socket.enabled, false);
         assert_eq!(socket.capacity, 0);
 

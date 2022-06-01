@@ -37,7 +37,7 @@ mod tests {
 
     #[test]
     fn thermo_works() {
-        let mut thermo = SmartThermometer::new("Test".into());
+        let mut thermo = SmartThermometer::new("Test");
         assert_eq!(thermo.temperature, 0);
 
         thermo.set_temperature(100);
