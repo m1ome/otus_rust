@@ -36,16 +36,29 @@ mod tests {
 
     #[test]
     fn room_works() {
-        let thermo = SmartThermometer::new("Test".into());
-        assert_eq!(thermo.temperature, 0);
+        let thermo = SmartThermometer::new("thermo#1");
+        let socket = SmartSocket::new("socket#1");
 
         let mut room = Room::new("Test Room".into());
         assert_eq!(room.devices_names(), Vec::<String>::new());
 
         room.add_device(&thermo);
-        assert_eq!(room.devices_names(), vec!["Test"]);
+        room.add_device(&socket);
 
-        let report = room.report();
-        assert_eq!(report, "device Test showing 0 temperature");
+        let mut devices = room.devices_names();
+        devices.sort();
+
+        let mut expected_devices = vec!["thermo#1", "socket#1"];
+        expected_devices.sort();
+
+        assert_eq!(devices, expected_devices);
+
+        let report_items = room
+            .report()
+            .as_str()
+            .split("\n")
+            .collect::<Vec<&str>>()
+            .len();
+        assert_eq!(report_items, 2);
     }
 }

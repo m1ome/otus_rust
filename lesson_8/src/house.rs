@@ -45,7 +45,7 @@ mod tests {
         let mut house = SmartHouse::new("Test House".into());
         let mut room = Room::new("room#1".into());
 
-        assert_eq!(house.devices("room#1".into()).is_err(), true);
+        assert!(house.devices("room#1".into()).is_err());
         assert_eq!(house.rooms(), Vec::<&String>::new());
 
         let socket = SmartSocket::new("socket#1");
@@ -55,9 +55,14 @@ mod tests {
         room.add_device(&thermo);
 
         house.add_room(&room);
-
-        let devices = house.devices("room#1".into()).unwrap().sort();
-        assert_eq!(devices, vec!["socket#1", "thermo#1"].sort());
         assert_eq!(house.rooms(), vec!["room#1"]);
+
+        let mut devices = house.devices("room#1".into()).unwrap();
+        devices.sort();
+
+        let mut expected_devices = vec!["socket#1", "thermo#1"];
+        expected_devices.sort();
+
+        assert_eq!(devices, expected_devices);
     }
 }
