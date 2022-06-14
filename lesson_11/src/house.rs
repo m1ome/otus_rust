@@ -16,7 +16,7 @@ impl<'a> SmartHouse<'a> {
 
     pub fn add_room(&mut self, room: &'a Room<'a>) -> Result<(), String> {
         if self.rooms.contains_key(&room.name) {
-            return Err(format!("house already have room {}", room.name))
+            return Err(format!("house already have room {}", room.name));
         }
 
         self.rooms.insert(room.name.clone(), room);
@@ -25,11 +25,11 @@ impl<'a> SmartHouse<'a> {
 
     pub fn rooms(&self) -> Option<Vec<&String>> {
         let room_names: Vec<&String> = self.rooms.keys().collect();
-        if room_names.len() == 0 {
+        if room_names.is_empty() {
             return None;
         }
 
-        return Some(room_names);
+        Some(room_names)
     }
 
     pub fn devices(&self, name: String) -> Result<Vec<String>, String> {
@@ -40,16 +40,16 @@ impl<'a> SmartHouse<'a> {
     }
 
     pub fn create_report(&self) -> Option<String> {
-        if self.rooms.len() == 0 {
+        if self.rooms.is_empty() {
             return None;
         }
 
-        let reports: Vec<String> = self.rooms.values()
-            .map(|r| {
-                match r.report() {
-                    None => format!("empty report for {}", r.name),
-                    Some(report) => report
-                }
+        let reports: Vec<String> = self
+            .rooms
+            .values()
+            .map(|r| match r.report() {
+                None => format!("empty report for {}", r.name),
+                Some(report) => report,
             })
             .collect();
         let report = format!("House {} report: \n{}", self.name, reports.join("\n"));

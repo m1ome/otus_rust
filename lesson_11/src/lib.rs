@@ -41,7 +41,7 @@
 //!
 //! house.add_room(&room1).unwrap();
 //! house.add_room(&room2).unwrap();
-//! 
+//!
 //! match house.rooms() {
 //!     None => println!("smart_house don't have rooms"),
 //!     Some(rooms) => println!("smart_house rooms: {:?}", rooms)

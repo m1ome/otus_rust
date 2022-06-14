@@ -39,6 +39,6 @@ fn main() {
 
     match house.create_report() {
         None => println!("empty report for house"),
-        Some(report) => print!("report: {}", report)
+        Some(report) => print!("report: {}", report),
     }
 }

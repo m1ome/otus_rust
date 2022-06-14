@@ -15,7 +15,7 @@ impl<'a> Room<'a> {
         }
     }
 
-    pub fn add_device(&mut self, device: &'a dyn DeviceInfoProvider) -> Result<(), String>{
+    pub fn add_device(&mut self, device: &'a dyn DeviceInfoProvider) -> Result<(), String> {
         if self.devices.contains_key(&device.name()) {
             return Err(format!("room already have {} device", device.name()));
         }
@@ -29,10 +29,10 @@ impl<'a> Room<'a> {
     }
 
     pub fn report(&self) -> Option<String> {
-        if self.devices.len() == 0 {
+        if self.devices.is_empty() {
             return None;
         }
-        
+
         let reports: Vec<String> = self.devices.values().map(|d| d.info()).collect();
         let report = reports.join("\n");
 
