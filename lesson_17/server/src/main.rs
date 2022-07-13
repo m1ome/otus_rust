@@ -19,6 +19,17 @@ impl Thermo {
     }
 }
 
+fn read_bytes_from_socket(buf: &mut [u8; 8], socket: &UdpSocket) -> Result<(), String> {
+    let mut bytes_read = 0;
+    
+    while bytes_read < buf.len() {
+        let (_amt, _src) = socket.recv_from(buf).map_err(|e| e.to_string())?;
+        bytes_read += _amt;
+    }
+
+    Ok(())
+}
+
 fn main() {
     let thermo = Arc::new(RwLock::new(Thermo::new(0)));
     let thermo_ref = thermo.clone();
@@ -31,7 +42,7 @@ fn main() {
     let thread_receive = thread::spawn(move || {
         let mut buf = [0; 8];
         loop {
-            let (_amt, _src) = socket.recv_from(&mut buf).unwrap();
+            read_bytes_from_socket(&mut buf, &socket).unwrap();
             let thermo = i64::from_ne_bytes(buf);
             tx.send(thermo).unwrap();
         }
