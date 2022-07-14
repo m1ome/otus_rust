@@ -21,10 +21,12 @@ impl Thermo {
 
 fn read_bytes_from_socket(buf: &mut [u8; 8], socket: &UdpSocket) -> Result<(), String> {
     let mut bytes_read = 0;
-    
+
     while bytes_read < buf.len() {
-        let (_amt, _src) = socket.recv_from(buf).map_err(|e| e.to_string())?;
-        bytes_read += _amt;
+        let data_left = buf.get_mut(bytes_read..).unwrap();
+        let (n, _src) = socket.recv_from(data_left).map_err(|e| e.to_string())?;
+
+        bytes_read += n;
     }
 
     Ok(())

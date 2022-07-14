@@ -8,7 +8,10 @@ fn write_bytes_to_socket(buf: &[u8; 8], socket: &UdpSocket, server: &String) -> 
     let mut bytes_written = 0;
 
     while bytes_written < buf.len() {
-        let n = socket.send_to(buf, &server).map_err(|e| e.to_string())?;
+        let data_left = buf.get(bytes_written..).unwrap();
+        let n = socket
+            .send_to(data_left, &server)
+            .map_err(|e| e.to_string())?;
         bytes_written += n;
     }
 
