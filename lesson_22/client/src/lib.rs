@@ -1,6 +1,6 @@
-use tokio::net::ToSocketAddrs;
 use stp::client::{RequestResult, StpClient};
 use stp::error::ConnectResult;
+use tokio::net::ToSocketAddrs;
 
 pub struct Client {
     stp: StpClient,
@@ -17,7 +17,12 @@ impl Client {
         self.stp.send_request(request).await
     }
 
-    pub async fn create_socket(&mut self, socket_id: &str, power: &str, state: &str) -> RequestResult {
+    pub async fn create_socket(
+        &mut self,
+        socket_id: &str,
+        power: &str,
+        state: &str,
+    ) -> RequestResult {
         let request = format!("create_socket|||{}|||{}|||{}", socket_id, power, state);
         self.stp.send_request(request).await
     }
@@ -40,5 +45,5 @@ impl Client {
     pub async fn set_thermo(&mut self, thermo_id: &str, temp: &str) -> RequestResult {
         let request = format!("set_thermo|||{}|||{}", thermo_id, temp);
         self.stp.send_request(request).await
-    }    
+    }
 }

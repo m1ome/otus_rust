@@ -1,10 +1,10 @@
+use crate::error::{RecvError, RecvResult, SendResult};
 use std::io;
 use tokio::net::TcpStream;
-use crate::error::{RecvError, RecvResult, SendResult};
 
-pub mod server;
 pub mod client;
 pub mod error;
+pub mod server;
 
 async fn read_exact_async(s: &TcpStream, buf: &mut [u8]) -> io::Result<()> {
     let mut red = 0;

@@ -1,5 +1,5 @@
-use client::Client;
 use async_trait::async_trait;
+use client::Client;
 use std::io;
 
 #[async_trait]
@@ -39,7 +39,7 @@ impl State for Main {
             "3" => Ok(Box::new(ToggleSocket)),
             "4" => Ok(Box::new(CreateThermo)),
             "5" => Ok(Box::new(ShowThermo)),
-            "6" => Ok(Box::new(SetThermo)),            
+            "6" => Ok(Box::new(SetThermo)),
             _ => Ok(Box::new(Exit)),
         }
     }
@@ -179,4 +179,3 @@ impl State for SetThermo {
         Ok(Box::new(Main))
     }
 }
-

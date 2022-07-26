@@ -55,7 +55,7 @@ impl RequestHandler {
 
         match self.home.thermo_info(thermo_id.into()) {
             Some(info) => info,
-            None => "Unknown thermo".into()
+            None => "Unknown thermo".into(),
         }
     }
 
@@ -89,7 +89,7 @@ impl RequestHandler {
     fn create_thermo(&mut self, mut request: Request) -> String {
         let thermo_id = request.next();
         if thermo_id.is_empty() {
-            return "Provide thermo id".into()
+            return "Provide thermo id".into();
         }
 
         let temp = request.next();
@@ -100,7 +100,7 @@ impl RequestHandler {
         let temp_value = temp.parse().unwrap_or(0);
         match self.home.create_thermo(thermo_id.into(), temp_value) {
             Some(r) => format!("Thermo `{}` created", r),
-            None => format!("Thermo `{}` already exists", thermo_id)
+            None => format!("Thermo `{}` already exists", thermo_id),
         }
     }
 
@@ -119,18 +119,18 @@ impl RequestHandler {
     fn set_thermo(&mut self, mut request: Request) -> String {
         let thermo_id = request.next();
         if thermo_id.is_empty() {
-            return "Select thermo id".into()
+            return "Select thermo id".into();
         }
 
         let temp = request.next();
         if temp.is_empty() {
             return "Provide thermo power".into();
-        }        
+        }
 
         let temp_value = temp.parse().unwrap_or(0);
         match self.home.set_thermo(thermo_id, temp_value) {
             Some(_) => format!("Thermo `{}` set temp {}", thermo_id, temp_value),
-            None => "Bad thermo".into(),            
+            None => "Bad thermo".into(),
         }
     }
 }
@@ -163,7 +163,7 @@ mod tests {
         assert_eq!(fetched, "Socket socket_1 state is true, power is 100");
     }
 
-    #[test] 
+    #[test]
     fn thermos() {
         let home = Home::default();
         let mut handler = RequestHandler::new(home);
@@ -184,6 +184,6 @@ mod tests {
         let req = Request::new(&req_str);
         let fetched = handler.handle(req);
 
-        assert_eq!(fetched, "Thermo thermo_1 temperature is 50");        
+        assert_eq!(fetched, "Thermo thermo_1 temperature is 50");
     }
 }

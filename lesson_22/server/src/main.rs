@@ -8,8 +8,9 @@ use tokio::fs;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let addr =
-        fs::read_to_string("settings/addr").await.unwrap_or_else(|_| String::from("127.0.0.1:55331"));
+    let addr = fs::read_to_string("settings/addr")
+        .await
+        .unwrap_or_else(|_| String::from("127.0.0.1:55331"));
     let server = StpServer::bind(addr).await?;
     let home = Home::default();
 

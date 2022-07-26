@@ -83,19 +83,19 @@ impl Socket {
 
 pub struct Thermo {
     name: String,
-    temp: i64
+    temp: i64,
 }
 
 impl Thermo {
     pub fn new(name: &str, temp: i64) -> Self {
-        Self { name: String::from(name), temp }
+        Self {
+            name: String::from(name),
+            temp,
+        }
     }
 
     pub fn info(&self) -> String {
-        format!(
-            "Thermo {} temperature is {}",
-            self.name, self.temp
-        )
+        format!("Thermo {} temperature is {}", self.name, self.temp)
     }
 
     pub fn set_temp(&mut self, temp: i64) {
