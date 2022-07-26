@@ -1,8 +1,11 @@
 use client::Client;
+use async_trait::async_trait;
 use std::io;
 
+#[async_trait]
+
 pub trait State {
-    fn update(&mut self, client: &mut Client) -> Result<Box<dyn State>, anyhow::Error>;
+    async fn update(&mut self, client: &mut Client) -> Result<Box<dyn State>, anyhow::Error>;
 
     fn exit(&self) -> bool {
         false
@@ -11,8 +14,9 @@ pub trait State {
 
 pub struct Main;
 
+#[async_trait]
 impl State for Main {
-    fn update(&mut self, _: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, _: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!(
             "Select option:
     1) Create socket
@@ -43,8 +47,9 @@ impl State for Main {
 
 struct Exit;
 
+#[async_trait]
 impl State for Exit {
-    fn update(&mut self, _: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, _: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         unreachable!()
     }
 
@@ -55,8 +60,9 @@ impl State for Exit {
 
 struct CreateSocket;
 
+#[async_trait]
 impl State for CreateSocket {
-    fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!("Enter socket name:");
         let mut buf = String::new();
         io::stdin().read_line(&mut buf)?;
@@ -72,7 +78,7 @@ impl State for CreateSocket {
         io::stdin().read_line(&mut buf)?;
         let state = buf.trim();
 
-        let create_result = home.create_socket(name, power, state)?;
+        let create_result = home.create_socket(name, power, state).await?;
 
         println!("Create socket: {}", create_result);
         Ok(Box::new(Main))
@@ -81,14 +87,15 @@ impl State for CreateSocket {
 
 struct ShowSocket;
 
+#[async_trait]
 impl State for ShowSocket {
-    fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!("Enter socket name:");
         let mut buf = String::new();
         io::stdin().read_line(&mut buf)?;
 
         let name = buf.trim();
-        let info_result = home.fetch_socket(name)?;
+        let info_result = home.fetch_socket(name).await?;
 
         println!("Socket: {}", info_result);
 
@@ -98,14 +105,15 @@ impl State for ShowSocket {
 
 struct ToggleSocket;
 
+#[async_trait]
 impl State for ToggleSocket {
-    fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!("Enter socket name:");
         let mut buf = String::new();
         io::stdin().read_line(&mut buf)?;
 
         let name = buf.trim();
-        println!("Result: {}", home.toggle_socket(name)?);
+        println!("Result: {}", home.toggle_socket(name).await?);
 
         Ok(Box::new(Main))
     }
@@ -113,8 +121,9 @@ impl State for ToggleSocket {
 
 struct CreateThermo;
 
+#[async_trait]
 impl State for CreateThermo {
-    fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!("Enter thermo name:");
         let mut buf = String::new();
         io::stdin().read_line(&mut buf)?;
@@ -125,7 +134,7 @@ impl State for CreateThermo {
         io::stdin().read_line(&mut buf)?;
         let temp = buf.trim();
 
-        let create_result = home.create_thermo(name, temp)?;
+        let create_result = home.create_thermo(name, temp).await?;
 
         println!("Create thermo: {}", create_result);
         Ok(Box::new(Main))
@@ -134,14 +143,15 @@ impl State for CreateThermo {
 
 struct ShowThermo;
 
+#[async_trait]
 impl State for ShowThermo {
-    fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!("Enter thermo name:");
         let mut buf = String::new();
         io::stdin().read_line(&mut buf)?;
 
         let name = buf.trim();
-        let info_result = home.fetch_thermo(name)?;
+        let info_result = home.fetch_thermo(name).await?;
 
         println!("Thermo: {}", info_result);
 
@@ -151,8 +161,9 @@ impl State for ShowThermo {
 
 struct SetThermo;
 
+#[async_trait]
 impl State for SetThermo {
-    fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
+    async fn update(&mut self, home: &mut Client) -> Result<Box<dyn State>, anyhow::Error> {
         println!("Enter thermo name:");
         let mut buf = String::new();
         io::stdin().read_line(&mut buf)?;
@@ -163,7 +174,7 @@ impl State for SetThermo {
         io::stdin().read_line(&mut buf)?;
         let temp = buf.trim();
 
-        println!("Result: {}", home.set_thermo(name, temp)?);
+        println!("Result: {}", home.set_thermo(name, temp).await?);
 
         Ok(Box::new(Main))
     }

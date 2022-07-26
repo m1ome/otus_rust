@@ -1,17 +1,17 @@
 use client::Client;
 use state::{Main, State};
-use std::error::Error;
 use std::fs;
 
 mod state;
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let addr = get_server_addr();
-    let mut client = Client::new(addr)?;
+    let mut client = Client::new(addr).await?;
 
     let mut state: Box<dyn State> = Box::new(Main);
     while !state.exit() {
-        state = state.update(&mut client)?;
+        state = state.update(&mut client).await?;
     }
 
     Ok(())
