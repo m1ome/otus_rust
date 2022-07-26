@@ -3,18 +3,18 @@ mod home;
 
 use handler::{Request, RequestHandler};
 use home::Home;
-use std::error::Error;
-use std::{fs, thread};
 use stp::server::{StpConnection, StpServer};
+use tokio::fs;
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let addr =
-        fs::read_to_string("settings/addr").unwrap_or_else(|_| String::from("127.0.0.1:55331"));
-    let server = StpServer::bind(addr)?;
+        fs::read_to_string("settings/addr").await.unwrap_or_else(|_| String::from("127.0.0.1:55331"));
+    let server = StpServer::bind(addr).await?;
     let home = Home::default();
 
-    for connection in server.incoming() {
-        let connection = match connection {
+    loop {
+        let connection = match server.accept().await {
             Ok(c) => c,
             Err(e) => {
                 eprintln!("Can't establish connection: {}", e);
@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         };
 
-        let addr = match connection.peer_addr() {
+        let addr = match connection.peer_addr().await {
             Ok(addr) => addr.to_string(),
             Err(_) => "unknown".into(),
         };
@@ -30,20 +30,19 @@ fn main() -> Result<(), Box<dyn Error>> {
         println!("New client connected: {}", addr);
 
         let home = home.clone();
-        thread::spawn(move || {
-            if handle_connection(connection, home).is_err() {
+        tokio::spawn(async move {
+            if handle_connection(connection, home).await.is_err() {
                 println!("Client disconnected: {}", addr);
             }
         });
     }
-    Ok(())
 }
 
-fn handle_connection(mut connection: StpConnection, home: Home) -> Result<(), anyhow::Error> {
+async fn handle_connection(connection: StpConnection, home: Home) -> Result<(), anyhow::Error> {
     let mut handler = RequestHandler::new(home);
     loop {
-        let req_str = connection.recv_request()?;
+        let req_str = connection.recv_request().await?;
         let req = Request::new(&req_str);
-        connection.send_response(handler.handle(req))?;
+        connection.send_response(handler.handle(req)).await?;
     }
 }
