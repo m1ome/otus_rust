@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use thiserror::Error;
 
 use crate::devices::DeviceInfoProvider;
 
@@ -15,19 +16,19 @@ impl<'a> Room<'a> {
         }
     }
 
-    pub fn add_device(&mut self, device: &'a dyn DeviceInfoProvider) -> Result<(), String> {
+    pub fn add_device(&mut self, device: &'a dyn DeviceInfoProvider) -> anyhow::Result<()> {
         if self.devices.contains_key(&device.name()) {
-            return Err(format!("room already have {} device", device.name()));
+            return Err(RoomError::DeviceAlreadyExists(device.name()).into());
         }
 
         self.devices.insert(device.name(), device);
         Ok(())
     }
 
-    pub fn remove_device(&mut self, name: &str) -> Result<(), String> {
+    pub fn remove_device(&mut self, name: &str) -> anyhow::Result<()> {
         match self.devices.remove(name) {
             Some(_) => Ok(()),
-            None => Err(format!("unknown device {} device", name)),
+            None => Err(RoomError::NoSuchDevice(name.into()).into()),
         }
     }
 
@@ -45,6 +46,14 @@ impl<'a> Room<'a> {
 
         Some(report)
     }
+}
+
+#[derive(Error, Debug)]
+pub enum RoomError {
+    #[error("no such device {0}")]
+    NoSuchDevice(String),
+    #[error("device {0} already in room")]
+    DeviceAlreadyExists(String),
 }
 
 #[cfg(test)]

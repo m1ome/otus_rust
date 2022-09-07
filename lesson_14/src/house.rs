@@ -1,5 +1,6 @@
 use crate::room::Room;
 use std::collections::HashMap;
+use thiserror::Error;
 
 pub struct SmartHouse<'a> {
     pub name: String,
@@ -14,19 +15,19 @@ impl<'a> SmartHouse<'a> {
         }
     }
 
-    pub fn add_room(&mut self, room: &'a Room<'a>) -> Result<(), String> {
+    pub fn add_room(&mut self, room: &'a Room<'a>) -> anyhow::Result<()> {
         if self.rooms.contains_key(&room.name) {
-            return Err(format!("house already have room {}", room.name));
+            return Err(HouseError::RoomAlreadyExists(room.name.clone()).into());
         }
 
         self.rooms.insert(room.name.clone(), room);
         Ok(())
     }
 
-    pub fn remove_room(&mut self, room_name: &str) -> Result<(), String> {
+    pub fn remove_room(&mut self, room_name: &str) -> anyhow::Result<()> {
         match self.rooms.remove(room_name) {
             Some(_) => Ok(()),
-            None => Err(format!("house don't have room {}", room_name)),
+            None => Err(HouseError::NoSuchRoom(room_name.into()).into()),
         }
     }
 
@@ -39,10 +40,10 @@ impl<'a> SmartHouse<'a> {
         Some(room_names)
     }
 
-    pub fn devices(&self, name: String) -> Result<Vec<String>, String> {
+    pub fn devices(&self, name: String) -> anyhow::Result<Vec<String>> {
         match self.rooms.get(&name) {
             Some(room) => Ok(room.devices_names()),
-            None => Err(format!("Unknown room {}", name)),
+            None => Err(HouseError::NoSuchRoom(name).into()),
         }
     }
 
@@ -63,6 +64,15 @@ impl<'a> SmartHouse<'a> {
 
         Some(report)
     }
+}
+
+#[derive(Error, Debug)]
+pub enum HouseError {
+    #[error("can't find room {0}")]
+    NoSuchRoom(String),
+
+    #[error("room {0} not exist")]
+    RoomAlreadyExists(String),
 }
 
 #[cfg(test)]
